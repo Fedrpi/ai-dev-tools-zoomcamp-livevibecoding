@@ -2,15 +2,18 @@
 Session models
 """
 
-from sqlalchemy import Column, Integer, String, DateTime, Enum, ForeignKey
+import enum
+
+from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+
 from app.database import Base
-import enum
 
 
 class SessionStatus(str, enum.Enum):
     """Session status enum"""
+
     WAITING = "waiting"
     ACTIVE = "active"
     ENDED = "ended"
@@ -35,7 +38,9 @@ class Session(Base):
     # Relationships
     interviewer = relationship("User", foreign_keys=[interviewer_id])
     candidate = relationship("User", foreign_keys=[candidate_id])
-    session_problems = relationship("SessionProblem", back_populates="session", cascade="all, delete-orphan")
+    session_problems = relationship(
+        "SessionProblem", back_populates="session", cascade="all, delete-orphan"
+    )
     evaluations = relationship("Evaluation", back_populates="session", cascade="all, delete-orphan")
 
     def __repr__(self):

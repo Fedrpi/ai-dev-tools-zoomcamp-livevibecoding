@@ -2,11 +2,13 @@
 Session schemas
 """
 
-from pydantic import BaseModel, Field
-from typing import List, Optional, Literal
 from datetime import datetime
-from .user import User
+from typing import Literal
+
+from pydantic import BaseModel, Field
+
 from .problem import Problem
+from .user import User
 
 
 class SessionCreate(BaseModel):
@@ -24,7 +26,7 @@ class SessionCreate(BaseModel):
                     "interviewerName": "John Doe",
                     "difficulty": "junior",
                     "language": "python",
-                    "numberOfProblems": 3
+                    "numberOfProblems": 3,
                 }
             ]
         }
@@ -38,10 +40,7 @@ class SessionInfo(BaseModel):
     difficulty: str = Field(..., example="junior")
     language: str = Field(..., example="python")
     numberOfProblems: int = Field(..., example=3)
-    interviewer: dict = Field(
-        ...,
-        example={"name": "John Doe"}
-    )
+    interviewer: dict = Field(..., example={"name": "John Doe"})
 
     model_config = {
         "json_schema_extra": {
@@ -51,7 +50,7 @@ class SessionInfo(BaseModel):
                     "difficulty": "junior",
                     "language": "python",
                     "numberOfProblems": 3,
-                    "interviewer": {"name": "John Doe"}
+                    "interviewer": {"name": "John Doe"},
                 }
             ]
         }
@@ -65,12 +64,12 @@ class Session(BaseModel):
     difficulty: Literal["junior", "middle", "senior"] = Field(..., example="junior")
     language: Literal["python"] = Field(..., example="python")
     numberOfProblems: int = Field(..., example=3)
-    problems: List[Problem] = Field(default_factory=list)
+    problems: list[Problem] = Field(default_factory=list)
     interviewer: User
-    candidate: Optional[User] = None
+    candidate: User | None = None
     status: Literal["waiting", "active", "ended"] = Field(..., example="waiting")
     createdAt: datetime = Field(default_factory=datetime.now)
-    endedAt: Optional[datetime] = None
+    endedAt: datetime | None = None
 
     model_config = {
         "populate_by_name": True,
@@ -86,8 +85,8 @@ class Session(BaseModel):
                     "candidate": None,
                     "status": "waiting",
                     "createdAt": "2025-12-06T10:00:00Z",
-                    "endedAt": None
+                    "endedAt": None,
                 }
             ]
-        }
+        },
     }

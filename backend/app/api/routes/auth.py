@@ -4,6 +4,7 @@ Authentication endpoints
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
+
 from app.schemas import User
 
 router = APIRouter()
@@ -31,10 +32,7 @@ async def login(request: LoginRequest):
     if len(request.name) < 3:
         raise HTTPException(
             status_code=400,
-            detail={
-                "error": "ValidationError",
-                "message": "Name must be at least 3 characters"
-            }
+            detail={"error": "ValidationError", "message": "Name must be at least 3 characters"},
         )
 
     # Mock response

@@ -1,23 +1,18 @@
 """
 WebSocket endpoints for real-time synchronization
 """
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, Query
-from sqlalchemy.ext.asyncio import AsyncSession
-from typing import Optional
+
 import json
 
-from app.websocket import manager
-from app.database import get_db
-from app.services import sessions as sessions_service
+from fastapi import APIRouter, Query, WebSocket, WebSocketDisconnect
+
 from app.schemas.websocket import (
-    CodeUpdateMessage,
-    ProblemChangeMessage,
-    UserJoinedMessage,
-    UserLeftMessage,
     ConnectionStatusMessage,
     ErrorMessage,
-    RunCodeMessage,
+    UserJoinedMessage,
+    UserLeftMessage,
 )
+from app.websocket import manager
 
 router = APIRouter()
 
@@ -26,8 +21,8 @@ router = APIRouter()
 async def websocket_endpoint(
     websocket: WebSocket,
     session_id: str,
-    user_name: Optional[str] = Query(None),
-    user_role: Optional[str] = Query(None)
+    user_name: str | None = Query(None),
+    user_role: str | None = Query(None),
 ):
     """
     WebSocket endpoint for real-time session synchronization
@@ -43,22 +38,17 @@ async def websocket_endpoint(
         connection_count = manager.get_session_connection_count(session_id)
         await manager.send_personal_message(
             ConnectionStatusMessage(
-                status="connected",
-                sessionId=session_id,
-                activeUsers=connection_count
+                status="connected", sessionId=session_id, activeUsers=connection_count
             ).model_dump(),
-            websocket
+            websocket,
         )
 
         # Notify others that user joined
         if user_name and user_role:
             await manager.broadcast_to_session(
-                UserJoinedMessage(
-                    userName=user_name,
-                    role=user_role
-                ).model_dump(),
+                UserJoinedMessage(userName=user_name, role=user_role).model_dump(),
                 session_id,
-                exclude=websocket
+                exclude=websocket,
             )
 
         # Listen for messages
@@ -73,16 +63,12 @@ async def websocket_endpoint(
                 await manager.broadcast_to_session(
                     message,
                     session_id,
-                    exclude=websocket  # Don't send back to sender
+                    exclude=websocket,  # Don't send back to sender
                 )
 
             elif message_type == "problem_change":
                 # Broadcast problem change to all in session
-                await manager.broadcast_to_session(
-                    message,
-                    session_id,
-                    exclude=websocket
-                )
+                await manager.broadcast_to_session(message, session_id, exclude=websocket)
 
             elif message_type == "run_code":
                 # For now, just echo back (execution will be implemented in Stage 12)
@@ -92,19 +78,18 @@ async def websocket_endpoint(
                         "type": "code_result",
                         "problemId": message.get("problemId"),
                         "success": False,
-                        "error": "Code execution not yet implemented"
+                        "error": "Code execution not yet implemented",
                     },
-                    websocket
+                    websocket,
                 )
 
             else:
                 # Unknown message type
                 await manager.send_personal_message(
                     ErrorMessage(
-                        message=f"Unknown message type: {message_type}",
-                        code="UNKNOWN_MESSAGE_TYPE"
+                        message=f"Unknown message type: {message_type}", code="UNKNOWN_MESSAGE_TYPE"
                     ).model_dump(),
-                    websocket
+                    websocket,
                 )
 
     except WebSocketDisconnect:
@@ -113,22 +98,14 @@ async def websocket_endpoint(
         # Notify others that user left
         if user_name and user_role:
             await manager.broadcast_to_session(
-                UserLeftMessage(
-                    userName=user_name,
-                    role=user_role
-                ).model_dump(),
-                session_id
+                UserLeftMessage(userName=user_name, role=user_role).model_dump(), session_id
             )
 
     except Exception as e:
         # Handle other errors
         try:
             await manager.send_personal_message(
-                ErrorMessage(
-                    message=str(e),
-                    code="INTERNAL_ERROR"
-                ).model_dump(),
-                websocket
+                ErrorMessage(message=str(e), code="INTERNAL_ERROR").model_dump(), websocket
             )
         except:
             pass

@@ -2,16 +2,17 @@
 Sessions service - business logic for interview sessions
 """
 
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from sqlalchemy.orm import selectinload
-from typing import Optional, List
-from datetime import datetime
 import random
 import string
+from datetime import datetime
 
-from app.models import Session, SessionProblem, User, Problem
-from app.services import users, problems as problems_service
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
+
+from app.models import Problem, Session, SessionProblem
+from app.services import problems as problems_service
+from app.services import users
 
 
 def generate_session_id() -> str:
@@ -21,15 +22,11 @@ def generate_session_id() -> str:
 
 def generate_link_code() -> str:
     """Generate unique link code for candidate"""
-    return ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
+    return "".join(random.choices(string.ascii_lowercase + string.digits, k=10))
 
 
 async def create_session(
-    db: AsyncSession,
-    interviewer_name: str,
-    difficulty: str,
-    language: str,
-    number_of_problems: int
+    db: AsyncSession, interviewer_name: str, difficulty: str, language: str, number_of_problems: int
 ) -> tuple[Session, str]:
     """
     Create a new interview session
@@ -59,7 +56,7 @@ async def create_session(
         number_of_problems=number_of_problems,
         interviewer_id=interviewer.id,
         status="waiting",
-        created_at=datetime.now()
+        created_at=datetime.now(),
     )
     db.add(session)
     await db.flush()
@@ -67,9 +64,7 @@ async def create_session(
     # Add session problems
     for idx, problem in enumerate(problem_list):
         session_problem = SessionProblem(
-            session_id=session_id,
-            problem_id=problem.id,
-            order_index=idx
+            session_id=session_id, problem_id=problem.id, order_index=idx
         )
         db.add(session_problem)
 
@@ -81,7 +76,7 @@ async def create_session(
         .options(
             selectinload(Session.interviewer),
             selectinload(Session.candidate),
-            selectinload(Session.session_problems).selectinload(SessionProblem.problem)
+            selectinload(Session.session_problems).selectinload(SessionProblem.problem),
         )
         .where(Session.id == session_id)
     )
@@ -91,7 +86,7 @@ async def create_session(
     return session, link_code
 
 
-async def get_session_by_id(db: AsyncSession, session_id: str) -> Optional[Session]:
+async def get_session_by_id(db: AsyncSession, session_id: str) -> Session | None:
     """
     Get session by ID with all relationships loaded
     """
@@ -100,7 +95,7 @@ async def get_session_by_id(db: AsyncSession, session_id: str) -> Optional[Sessi
         .options(
             selectinload(Session.interviewer),
             selectinload(Session.candidate),
-            selectinload(Session.session_problems).selectinload(SessionProblem.problem)
+            selectinload(Session.session_problems).selectinload(SessionProblem.problem),
         )
         .where(Session.id == session_id)
     )
@@ -108,7 +103,7 @@ async def get_session_by_id(db: AsyncSession, session_id: str) -> Optional[Sessi
     return result.scalar_one_or_none()
 
 
-async def get_session_by_link_code(db: AsyncSession, link_code: str) -> Optional[Session]:
+async def get_session_by_link_code(db: AsyncSession, link_code: str) -> Session | None:
     """
     Get session by link code
     """
@@ -121,11 +116,7 @@ async def get_session_by_link_code(db: AsyncSession, link_code: str) -> Optional
     return result.scalar_one_or_none()
 
 
-async def join_session(
-    db: AsyncSession,
-    session_id: str,
-    candidate_name: str
-) -> Session:
+async def join_session(db: AsyncSession, session_id: str, candidate_name: str) -> Session:
     """
     Candidate joins a session
     """
@@ -173,7 +164,7 @@ async def end_session(db: AsyncSession, session_id: str) -> Session:
     return session
 
 
-def get_session_problems(session: Session) -> List[Problem]:
+def get_session_problems(session: Session) -> list[Problem]:
     """
     Get ordered list of problems for a session
     """

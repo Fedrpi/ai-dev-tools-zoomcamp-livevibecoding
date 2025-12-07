@@ -2,14 +2,17 @@
 User model
 """
 
-from sqlalchemy import Column, Integer, String, DateTime, Enum
-from sqlalchemy.sql import func
-from app.database import Base
 import enum
+
+from sqlalchemy import Column, DateTime, Enum, Integer, String
+from sqlalchemy.sql import func
+
+from app.database import Base
 
 
 class UserRole(str, enum.Enum):
     """User role enum"""
+
     INTERVIEWER = "interviewer"
     CANDIDATE = "candidate"
 

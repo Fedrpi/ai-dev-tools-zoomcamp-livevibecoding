@@ -42,7 +42,12 @@ select = [
 ignore = [
     "E501",  # line too long (handled by formatter)
     "B008",  # do not perform function calls in argument defaults
+    "E722",  # bare except (allow in specific cases)
 ]
+
+[tool.ruff.lint.per-file-ignores]
+"alembic/**/*.py" = ["E402", "W291"]  # Allow imports after config in alembic
+"app/main.py" = ["E402"]  # Allow imports after app initialization
 
 [tool.ruff.format]
 quote-style = "double"

@@ -2,16 +2,16 @@
 Pydantic schemas for request/response validation
 """
 
-from .user import User
+from .error import Error
+from .evaluation import ProblemEvaluation
+from .execution import ExecutionResult
 from .problem import Problem, TestCase
 from .session import (
     Session,
     SessionCreate,
     SessionInfo,
 )
-from .evaluation import ProblemEvaluation
-from .execution import ExecutionResult
-from .error import Error
+from .user import User
 
 __all__ = [
     "User",

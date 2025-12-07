@@ -2,6 +2,6 @@
 Business logic services
 """
 
-from . import problems, sessions, users, evaluations
+from . import evaluations, problems, sessions, users
 
 __all__ = ["problems", "sessions", "users", "evaluations"]

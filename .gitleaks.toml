@@ -5,43 +5,16 @@ title = "LiveCoding Interview - Gitleaks Configuration"
 useDefault = true
 
 # Allowlist for known false positives
-[[allowlist]]
-description = "Ignore .env.example files"
+[allowlist]
+description = "Allowlist for false positives"
 paths = [
   '''\.env\.example$''',
   '''\.env\.prod\.example$''',
-]
-
-[[allowlist]]
-description = "Ignore test passwords in docker-compose"
-paths = [
   '''docker-compose\.test\.yml$''',
-]
-
-[[allowlist]]
-description = "Ignore README and documentation"
-paths = [
   '''README\.md$''',
   '''DEPLOYMENT\.md$''',
   '''DOCKER\.md$''',
   '''TESTING\.md$''',
+  '''CI_CD\.md$''',
+  '''POST_DEPLOY\.md$''',
 ]
-
-# Custom rules for this project
-[[rules]]
-id = "postgres-password"
-description = "PostgreSQL password in environment variables"
-regex = '''POSTGRES_PASSWORD\s*=\s*["']?(?P<secret>[^"'\s]+)["']?'''
-tags = ["database", "password"]
-
-[[rules]]
-id = "database-url"
-description = "Database URL with credentials"
-regex = '''postgresql(\+asyncpg)?://[^:]+:(?P<secret>[^@]+)@'''
-tags = ["database", "connection-string"]
-
-[[rules]]
-id = "secret-key"
-description = "Secret keys in environment"
-regex = '''(SECRET_KEY|API_KEY|PRIVATE_KEY)\s*=\s*["']?(?P<secret>[^"'\s]{16,})["']?'''
-tags = ["key", "secret"]

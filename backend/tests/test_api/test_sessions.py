@@ -1,6 +1,7 @@
 """
 Tests for sessions API endpoints
 """
+
 import pytest
 
 
@@ -13,8 +14,8 @@ async def test_create_session(client, sample_problems):
             "interviewerName": "John Doe",
             "difficulty": "junior",
             "language": "python",
-            "numberOfProblems": 1
-        }
+            "numberOfProblems": 1,
+        },
     )
     assert response.status_code == 201
 
@@ -41,8 +42,8 @@ async def test_create_session_multiple_problems(client, sample_problems):
             "interviewerName": "Jane Smith",
             "difficulty": "middle",
             "language": "python",
-            "numberOfProblems": 1
-        }
+            "numberOfProblems": 1,
+        },
     )
     assert response.status_code == 201
 
@@ -59,8 +60,8 @@ async def test_create_session_not_enough_problems(client, sample_problems):
             "interviewerName": "John Doe",
             "difficulty": "senior",
             "language": "python",
-            "numberOfProblems": 3  # We only have 1 senior problem, but max is 5
-        }
+            "numberOfProblems": 3,  # We only have 1 senior problem, but max is 5
+        },
     )
     # Should return 400 for business logic error (not enough problems)
     assert response.status_code == 400
@@ -76,8 +77,8 @@ async def test_get_session_by_id(client, sample_problems):
             "interviewerName": "John Doe",
             "difficulty": "junior",
             "language": "python",
-            "numberOfProblems": 1
-        }
+            "numberOfProblems": 1,
+        },
     )
     session_id = create_response.json()["session"]["id"]
 
@@ -107,8 +108,8 @@ async def test_get_session_by_link_code(client, sample_problems):
             "interviewerName": "John Doe",
             "difficulty": "junior",
             "language": "python",
-            "numberOfProblems": 1
-        }
+            "numberOfProblems": 1,
+        },
     )
     link_code = create_response.json()["linkCode"]
 
@@ -133,15 +134,14 @@ async def test_join_session(client, sample_problems):
             "interviewerName": "John Doe",
             "difficulty": "junior",
             "language": "python",
-            "numberOfProblems": 1
-        }
+            "numberOfProblems": 1,
+        },
     )
     session_id = create_response.json()["session"]["id"]
 
     # Join the session
     response = await client.post(
-        f"/api/sessions/{session_id}/join",
-        json={"candidateName": "Jane Smith"}
+        f"/api/sessions/{session_id}/join", json={"candidateName": "Jane Smith"}
     )
     assert response.status_code == 200
 
@@ -155,8 +155,7 @@ async def test_join_session(client, sample_problems):
 async def test_join_session_not_found(client):
     """Test joining non-existent session"""
     response = await client.post(
-        "/api/sessions/nonexistent_id/join",
-        json={"candidateName": "Jane Smith"}
+        "/api/sessions/nonexistent_id/join", json={"candidateName": "Jane Smith"}
     )
     assert response.status_code == 404
 
@@ -171,8 +170,8 @@ async def test_end_session(client, sample_problems):
             "interviewerName": "John Doe",
             "difficulty": "junior",
             "language": "python",
-            "numberOfProblems": 1
-        }
+            "numberOfProblems": 1,
+        },
     )
     session_id = create_response.json()["session"]["id"]
 

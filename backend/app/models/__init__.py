@@ -2,9 +2,9 @@
 Database models
 """
 
-from .user import User
+from .evaluation import Evaluation
 from .problem import Problem
 from .session import Session, SessionProblem
-from .evaluation import Evaluation
+from .user import User
 
 __all__ = ["User", "Problem", "Session", "SessionProblem", "Evaluation"]

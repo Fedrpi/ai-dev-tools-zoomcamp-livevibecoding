@@ -1,7 +1,9 @@
 """
 Tests for evaluations service
 """
+
 import pytest
+
 from app.services import evaluations as evaluations_service
 from app.services import sessions as sessions_service
 
@@ -26,15 +28,11 @@ async def test_create_evaluations(db_session, sample_problems):
             "problemId": problem_id,
             "rating": 4,
             "comment": "Good solution",
-            "candidateCode": "def solution(): pass"
+            "candidateCode": "def solution(): pass",
         }
     ]
 
-    result = await evaluations_service.create_evaluations(
-        db_session,
-        session.id,
-        evaluations_data
-    )
+    result = await evaluations_service.create_evaluations(db_session, session.id, evaluations_data)
 
     assert len(result) == 1
     assert result[0].rating == 4
@@ -45,11 +43,7 @@ async def test_create_evaluations(db_session, sample_problems):
 async def test_create_evaluations_session_not_found(db_session):
     """Test creating evaluations for non-existent session"""
     with pytest.raises(ValueError, match="Session not found"):
-        await evaluations_service.create_evaluations(
-            db_session,
-            "nonexistent",
-            []
-        )
+        await evaluations_service.create_evaluations(db_session, "nonexistent", [])
 
 
 @pytest.mark.asyncio
@@ -60,11 +54,7 @@ async def test_create_evaluations_session_not_ended(db_session, sample_problems)
     )
 
     with pytest.raises(ValueError, match="must be ended"):
-        await evaluations_service.create_evaluations(
-            db_session,
-            session.id,
-            []
-        )
+        await evaluations_service.create_evaluations(db_session, session.id, [])
 
 
 @pytest.mark.asyncio
@@ -82,16 +72,12 @@ async def test_create_evaluations_invalid_problem_id(db_session, sample_problems
             "problemId": 99999,  # Invalid ID
             "rating": 4,
             "comment": "Test",
-            "candidateCode": "# code"
+            "candidateCode": "# code",
         }
     ]
 
     with pytest.raises(ValueError, match="Invalid problem IDs"):
-        await evaluations_service.create_evaluations(
-            db_session,
-            session.id,
-            evaluations_data
-        )
+        await evaluations_service.create_evaluations(db_session, session.id, evaluations_data)
 
 
 @pytest.mark.asyncio
@@ -113,15 +99,11 @@ async def test_create_multiple_evaluations(db_session, sample_problems):
             "problemId": p.id,
             "rating": i + 1,
             "comment": f"Comment {i}",
-            "candidateCode": f"# code {i}"
+            "candidateCode": f"# code {i}",
         }
         for i, p in enumerate(problems)
     ]
 
-    result = await evaluations_service.create_evaluations(
-        db_session,
-        session.id,
-        evaluations_data
-    )
+    result = await evaluations_service.create_evaluations(db_session, session.id, evaluations_data)
 
     assert len(result) == len(problems)

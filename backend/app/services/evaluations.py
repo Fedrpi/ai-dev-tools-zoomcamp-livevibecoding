@@ -3,16 +3,14 @@ Evaluations service - business logic for session evaluations
 """
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List
+
 from app.models import Evaluation
 from app.services import sessions as sessions_service
 
 
 async def create_evaluations(
-    db: AsyncSession,
-    session_id: str,
-    evaluations_data: List[dict]
-) -> List[Evaluation]:
+    db: AsyncSession, session_id: str, evaluations_data: list[dict]
+) -> list[Evaluation]:
     """
     Create evaluations for a session
     """
@@ -41,7 +39,7 @@ async def create_evaluations(
             problem_id=eval_data["problemId"],
             rating=eval_data["rating"],
             comment=eval_data.get("comment"),
-            candidate_code=eval_data.get("candidateCode")
+            candidate_code=eval_data.get("candidateCode"),
         )
         db.add(evaluation)
         evaluations.append(evaluation)

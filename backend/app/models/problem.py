@@ -2,14 +2,17 @@
 Problem model
 """
 
-from sqlalchemy import Column, Integer, String, Text, DateTime, Enum, JSON
-from sqlalchemy.sql import func
-from app.database import Base
 import enum
+
+from sqlalchemy import JSON, Column, DateTime, Enum, Integer, String, Text
+from sqlalchemy.sql import func
+
+from app.database import Base
 
 
 class Difficulty(str, enum.Enum):
     """Problem difficulty enum"""
+
     JUNIOR = "junior"
     MIDDLE = "middle"
     SENIOR = "senior"
@@ -17,6 +20,7 @@ class Difficulty(str, enum.Enum):
 
 class Language(str, enum.Enum):
     """Programming language enum"""
+
     PYTHON = "python"
 
 

@@ -2,19 +2,15 @@
 Sessions endpoints
 """
 
-from fastapi import APIRouter, HTTPException, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
-from typing import List
-from app.schemas import (
-    Session as SessionSchema,
-    SessionCreate,
-    SessionInfo,
-    User as UserSchema,
-    Problem as ProblemSchema,
-    TestCase
-)
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.database import get_db
+from app.schemas import Problem as ProblemSchema
+from app.schemas import Session as SessionSchema
+from app.schemas import SessionCreate, SessionInfo, TestCase
+from app.schemas import User as UserSchema
 from app.services import sessions as sessions_service
 
 router = APIRouter()
@@ -51,7 +47,9 @@ class EndSessionResponse(BaseModel):
     success: bool = True
 
 
-def db_session_to_schema(session, problems_list, interviewer_data, candidate_data=None) -> SessionSchema:
+def db_session_to_schema(
+    session, problems_list, interviewer_data, candidate_data=None
+) -> SessionSchema:
     """Convert database Session to schema"""
     # Convert problems to schema
     problem_schemas = []
@@ -64,23 +62,17 @@ def db_session_to_schema(session, problems_list, interviewer_data, candidate_dat
             language=p.language.value.lower(),
             description=p.description,
             starterCode=p.starter_code,
-            testCases=test_cases
+            testCases=test_cases,
         )
         problem_schemas.append(problem_schema)
 
     # Interviewer
-    interviewer_schema = UserSchema(
-        name=interviewer_data["name"],
-        role=interviewer_data["role"]
-    )
+    interviewer_schema = UserSchema(name=interviewer_data["name"], role=interviewer_data["role"])
 
     # Candidate (optional)
     candidate_schema = None
     if candidate_data:
-        candidate_schema = UserSchema(
-            name=candidate_data["name"],
-            role=candidate_data["role"]
-        )
+        candidate_schema = UserSchema(name=candidate_data["name"], role=candidate_data["role"])
 
     return SessionSchema(
         id=session.id,
@@ -90,17 +82,14 @@ def db_session_to_schema(session, problems_list, interviewer_data, candidate_dat
         problems=problem_schemas,
         interviewer=interviewer_schema,
         candidate=candidate_schema,
-        status=session.status.value if hasattr(session.status, 'value') else session.status,
+        status=session.status.value if hasattr(session.status, "value") else session.status,
         createdAt=session.created_at,
-        endedAt=session.ended_at
+        endedAt=session.ended_at,
     )
 
 
 @router.post("", response_model=CreateSessionResponse, status_code=201)
-async def create_session(
-    request: SessionCreate,
-    db: AsyncSession = Depends(get_db)
-):
+async def create_session(request: SessionCreate, db: AsyncSession = Depends(get_db)):
     """
     Create new interview session
 
@@ -112,14 +101,16 @@ async def create_session(
             request.interviewerName,
             request.difficulty,
             request.language,
-            request.numberOfProblems
+            request.numberOfProblems,
         )
 
         # Access relationships in async context
         problems = sessions_service.get_session_problems(session)
         interviewer_data = {
             "name": session.interviewer.name,
-            "role": session.interviewer.role.value if hasattr(session.interviewer.role, 'value') else session.interviewer.role
+            "role": session.interviewer.role.value
+            if hasattr(session.interviewer.role, "value")
+            else session.interviewer.role,
         }
 
         session_schema = db_session_to_schema(session, problems, interviewer_data)
@@ -128,19 +119,12 @@ async def create_session(
 
     except ValueError as e:
         raise HTTPException(
-            status_code=400,
-            detail={
-                "error": "ValidationError",
-                "message": str(e)
-            }
-        )
+            status_code=400, detail={"error": "ValidationError", "message": str(e)}
+        ) from e
 
 
 @router.get("/by-link/{linkCode}", response_model=SessionInfoResponse)
-async def get_session_by_link(
-    linkCode: str,
-    db: AsyncSession = Depends(get_db)
-):
+async def get_session_by_link(linkCode: str, db: AsyncSession = Depends(get_db)):
     """
     Get session by link code
 
@@ -150,11 +134,7 @@ async def get_session_by_link(
 
     if not session:
         raise HTTPException(
-            status_code=404,
-            detail={
-                "error": "NotFound",
-                "message": "Session not found"
-            }
+            status_code=404, detail={"error": "NotFound", "message": "Session not found"}
         )
 
     # Return limited info
@@ -163,17 +143,14 @@ async def get_session_by_link(
         difficulty=session.difficulty,
         language=session.language,
         numberOfProblems=session.number_of_problems,
-        interviewer={"name": session.interviewer.name}
+        interviewer={"name": session.interviewer.name},
     )
 
     return SessionInfoResponse(session=session_info)
 
 
 @router.get("/{sessionId}", response_model=SessionResponse)
-async def get_session(
-    sessionId: str,
-    db: AsyncSession = Depends(get_db)
-):
+async def get_session(sessionId: str, db: AsyncSession = Depends(get_db)):
     """
     Get session details
 
@@ -183,24 +160,24 @@ async def get_session(
 
     if not session:
         raise HTTPException(
-            status_code=404,
-            detail={
-                "error": "NotFound",
-                "message": "Session not found"
-            }
+            status_code=404, detail={"error": "NotFound", "message": "Session not found"}
         )
 
     # Access relationships in async context
     problems = sessions_service.get_session_problems(session)
     interviewer_data = {
         "name": session.interviewer.name,
-        "role": session.interviewer.role.value if hasattr(session.interviewer.role, 'value') else session.interviewer.role
+        "role": session.interviewer.role.value
+        if hasattr(session.interviewer.role, "value")
+        else session.interviewer.role,
     }
     candidate_data = None
     if session.candidate:
         candidate_data = {
             "name": session.candidate.name,
-            "role": session.candidate.role.value if hasattr(session.candidate.role, 'value') else session.candidate.role
+            "role": session.candidate.role.value
+            if hasattr(session.candidate.role, "value")
+            else session.candidate.role,
         }
 
     session_schema = db_session_to_schema(session, problems, interviewer_data, candidate_data)
@@ -209,9 +186,7 @@ async def get_session(
 
 @router.post("/{sessionId}/join", response_model=SessionResponse)
 async def join_session(
-    sessionId: str,
-    request: JoinSessionRequest,
-    db: AsyncSession = Depends(get_db)
+    sessionId: str, request: JoinSessionRequest, db: AsyncSession = Depends(get_db)
 ):
     """
     Candidate joins session
@@ -225,13 +200,17 @@ async def join_session(
         problems = sessions_service.get_session_problems(session)
         interviewer_data = {
             "name": session.interviewer.name,
-            "role": session.interviewer.role.value if hasattr(session.interviewer.role, 'value') else session.interviewer.role
+            "role": session.interviewer.role.value
+            if hasattr(session.interviewer.role, "value")
+            else session.interviewer.role,
         }
         candidate_data = None
         if session.candidate:
             candidate_data = {
                 "name": session.candidate.name,
-                "role": session.candidate.role.value if hasattr(session.candidate.role, 'value') else session.candidate.role
+                "role": session.candidate.role.value
+                if hasattr(session.candidate.role, "value")
+                else session.candidate.role,
             }
 
         session_schema = db_session_to_schema(session, problems, interviewer_data, candidate_data)
@@ -243,16 +222,13 @@ async def join_session(
             status_code=status_code,
             detail={
                 "error": "NotFound" if status_code == 404 else "ValidationError",
-                "message": str(e)
-            }
-        )
+                "message": str(e),
+            },
+        ) from e
 
 
 @router.post("/{sessionId}/end", response_model=EndSessionResponse)
-async def end_session(
-    sessionId: str,
-    db: AsyncSession = Depends(get_db)
-):
+async def end_session(sessionId: str, db: AsyncSession = Depends(get_db)):
     """
     End interview session
 
@@ -263,10 +239,4 @@ async def end_session(
         return EndSessionResponse(success=True)
 
     except ValueError as e:
-        raise HTTPException(
-            status_code=404,
-            detail={
-                "error": "NotFound",
-                "message": str(e)
-            }
-        )
+        raise HTTPException(status_code=404, detail={"error": "NotFound", "message": str(e)}) from e

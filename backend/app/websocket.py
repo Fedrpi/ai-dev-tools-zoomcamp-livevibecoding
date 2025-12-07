@@ -1,9 +1,8 @@
 """
 WebSocket connection manager for real-time synchronization
 """
-from typing import Dict, Set
+
 from fastapi import WebSocket
-import json
 
 
 class ConnectionManager:
@@ -11,7 +10,7 @@ class ConnectionManager:
 
     def __init__(self):
         # session_id -> set of websockets
-        self.active_connections: Dict[str, Set[WebSocket]] = {}
+        self.active_connections: dict[str, set[WebSocket]] = {}
 
     async def connect(self, websocket: WebSocket, session_id: str):
         """Accept WebSocket connection and add to session room"""
