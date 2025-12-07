@@ -1,10 +1,9 @@
-services:
-  # PostgreSQL Database
-  - type: pserv
-    name: livecoding-db
-    env: docker
-    plan: free
+databases:
+  - name: livecoding-db
+    databaseName: livecoding_db
+    user: livecoding
 
+services:
   # Backend API (FastAPI)
   - type: web
     name: livecoding-backend
