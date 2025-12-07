@@ -9,7 +9,9 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
+    "format": "prettier --write src/"
   },
   "dependencies": {
     "@monaco-editor/loader": "^1.7.0",
@@ -29,6 +31,9 @@
     "@vitest/ui": "^4.0.15",
     "@vue/test-utils": "^2.4.6",
     "autoprefixer": "^10.4.22",
+    "eslint": "^8.57.0",
+    "eslint-plugin-vue": "^9.20.0",
+    "prettier": "^3.2.5",
     "happy-dom": "^20.0.11",
     "jsdom": "^27.0.1",
     "postcss": "^8.5.6",

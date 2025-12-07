@@ -1,0 +1,57 @@
+name: Deploy to Cloud
+
+on:
+  workflow_dispatch:  # Manual deployment only
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  deploy:
+    name: Deploy to ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy placeholder
+        run: |
+          echo "🚀 Deployment to ${{ inputs.environment }} will be configured here"
+          echo "Supported platforms:"
+          echo "  - Railway"
+          echo "  - Fly.io"
+          echo "  - Render"
+          echo "  - Google Cloud Run"
+          echo "  - AWS ECS"
+          echo ""
+          echo "To configure deployment:"
+          echo "1. Choose your cloud platform"
+          echo "2. Add platform-specific secrets to GitHub repository"
+          echo "3. Update this workflow with deployment steps"
+          echo ""
+          echo "For now, this is a placeholder that will be configured later."
+
+      # Example for Railway (commented out)
+      # - name: Deploy to Railway
+      #   uses: bervProject/railway-deploy@main
+      #   with:
+      #     railway_token: ${{ secrets.RAILWAY_TOKEN }}
+      #     service: livecoding-backend
+
+      # Example for Fly.io (commented out)
+      # - name: Deploy to Fly.io
+      #   uses: superfly/flyctl-actions/setup-flyctl@master
+      # - run: flyctl deploy --remote-only
+
+      # Example for Render (commented out)
+      # - name: Trigger Render Deploy
+      #   run: |
+      #     curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
