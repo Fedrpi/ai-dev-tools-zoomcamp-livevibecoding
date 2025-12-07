@@ -2,9 +2,9 @@ name: CI Pipeline
 
 on:
   push:
-    branches: [ main, init, develop ]
+    branches: [ main, develop ]
   pull_request:
-    branches: [ main, init, develop ]
+    branches: [ main, develop ]
 
 jobs:
   # Security: Check for secrets and sensitive data
