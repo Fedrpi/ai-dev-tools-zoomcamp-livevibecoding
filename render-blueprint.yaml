@@ -1,0 +1,41 @@
+databases:
+  - name: livecoding-db
+    databaseName: livecoding_db
+    user: livecoding
+    plan: free
+
+services:
+  # Backend API (FastAPI)
+  - type: web
+    name: livecoding-backend
+    runtime: docker
+    plan: free
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: livecoding-db
+          property: connectionString
+      - key: CORS_ORIGINS
+        value: "*"
+    healthCheckPath: /health
+    autoDeploy: true
+
+  # Frontend (Static Site - simplest approach for Render)
+  - type: web
+    name: livecoding-frontend
+    runtime: static
+    plan: free
+    buildCommand: cd frontend && npm ci && npm run build
+    staticPublishPath: ./frontend/dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://livecoding-backend.onrender.com
+      - key: VITE_WS_BASE_URL
+        value: wss://livecoding-backend.onrender.com
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    autoDeploy: true

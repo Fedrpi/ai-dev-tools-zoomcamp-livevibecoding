@@ -1,0 +1,114 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Custom color palette - Neo-Brutalist Technical */
+    --color-tech-green: #00ff41;
+    --color-tech-orange: #ff6b35;
+    --color-tech-cyan: #00d9ff;
+    --color-tech-yellow: #ffdd00;
+
+    --color-dark-base: #0a0e27;
+    --color-dark-elevated: #151933;
+    --color-dark-border: #1e2542;
+
+    --color-light-base: #f5f5f0;
+    --color-light-elevated: #ffffff;
+    --color-light-border: #d4d4c8;
+
+    /* Typography */
+    --font-display: 'Space Mono', monospace;
+    --font-code: 'JetBrains Mono', monospace;
+    --font-body: 'JetBrains Mono', monospace;
+  }
+}
+
+:root {
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--color-dark-base);
+  color: var(--color-light-base);
+}
+
+#app {
+  min-height: 100vh;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-dark-base);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-tech-green);
+  border-radius: 0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-tech-cyan);
+}
+
+/* Selection */
+::selection {
+  background: var(--color-tech-green);
+  color: var(--color-dark-base);
+}
+
+/* Animations */
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-slide-in {
+  animation: slide-in 0.5s ease-out;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out;
+}
