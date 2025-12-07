@@ -1,14 +1,14 @@
-databases:
-  - name: livecoding-db
-    databaseName: livecoding_db
-    user: livecoding
+services:
+  # PostgreSQL Database
+  - type: pserv
+    name: livecoding-db
+    env: docker
     plan: free
 
-services:
   # Backend API (FastAPI)
   - type: web
     name: livecoding-backend
-    runtime: docker
+    env: docker
     plan: free
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
@@ -20,12 +20,11 @@ services:
       - key: CORS_ORIGINS
         value: "*"
     healthCheckPath: /health
-    autoDeploy: true
 
-  # Frontend (Static Site - simplest approach for Render)
+  # Frontend (Static Site)
   - type: web
     name: livecoding-frontend
-    runtime: static
+    env: static
     plan: free
     buildCommand: cd frontend && npm ci && npm run build
     staticPublishPath: ./frontend/dist
@@ -38,4 +37,3 @@ services:
       - type: rewrite
         source: /*
         destination: /index.html
-    autoDeploy: true
