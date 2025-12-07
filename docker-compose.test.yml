@@ -1,0 +1,75 @@
+services:
+  # Test PostgreSQL Database
+  test_db:
+    image: postgres:15-alpine
+    container_name: livecoding_test_db
+    environment:
+      POSTGRES_USER: livecoding
+      POSTGRES_PASSWORD: livecoding_password
+      POSTGRES_DB: livecoding_test_db
+    ports:
+      - "5433:5432"  # Different port to avoid conflict with dev DB
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U livecoding"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - livecoding_test
+    tmpfs:
+      - /var/lib/postgresql/data  # Use tmpfs for faster tests
+
+  # Run database migrations for tests
+  test_migrations:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: livecoding_test_migrations
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://livecoding:livecoding_password@test_db:5432/livecoding_test_db
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./backend:/app
+      - /app/.venv
+    depends_on:
+      test_db:
+        condition: service_healthy
+    networks:
+      - livecoding_test
+    command: sh -c ".venv/bin/alembic upgrade head"
+
+  # Backend Tests
+  backend_test:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: livecoding_backend_test
+    environment:
+      - TEST_DATABASE_URL=postgresql+asyncpg://livecoding:livecoding_password@test_db:5432/livecoding_test_db
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./backend:/app
+      - /app/.venv
+    depends_on:
+      test_migrations:
+        condition: service_completed_successfully
+    networks:
+      - livecoding_test
+    command: .venv/bin/pytest -v --tb=short
+
+  # Frontend Tests
+  frontend_test:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: livecoding_frontend_test
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - livecoding_test
+    command: npm run test:coverage
+
+networks:
+  livecoding_test:
+    driver: bridge
