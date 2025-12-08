@@ -2,9 +2,6 @@
 
 A real-time collaborative platform for conducting technical coding interviews with live code execution and evaluation.
 
-![CI Pipeline](https://github.com/YOUR_USERNAME/livevibecoding/workflows/CI%20Pipeline/badge.svg)
-![Build](https://github.com/YOUR_USERNAME/livevibecoding/workflows/Build%20and%20Push%20Docker%20Images/badge.svg)
-
 ## Features
 
 ### For Interviewers
