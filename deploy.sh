@@ -75,14 +75,13 @@ if [ -f "$BACKUP_FILE" ]; then
     ls -t "$BACKUP_DIR"/livecoding_backup_*.sql 2>/dev/null | tail -n +8 | xargs -r rm
 fi
 
-# Pull latest Docker images (if using pre-built images from registry)
-# Uncomment if you want to use images from GitHub Container Registry
-# log_info "Pulling latest Docker images..."
-# docker compose -f "$COMPOSE_FILE" pull
+# Pull latest Docker images from GitHub Container Registry
+log_info "Pulling latest Docker images..."
+docker compose -f "$COMPOSE_FILE" pull
 
-# Build Docker images
-log_info "Building Docker images..."
-docker compose -f "$COMPOSE_FILE" build --no-cache
+# Build Docker images (disabled - using pre-built images from GHCR)
+# log_info "Building Docker images..."
+# docker compose -f "$COMPOSE_FILE" build --no-cache
 
 # Stop old containers
 log_info "Stopping old containers..."
