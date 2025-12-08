@@ -18,9 +18,7 @@ services:
 
   # Backend (FastAPI + Uvicorn)
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: ghcr.io/fedrpi/livecoding-backend:latest
     container_name: livecoding_backend_prod
     env_file:
       - .env.prod
@@ -38,9 +36,7 @@ services:
 
   # Frontend (Nginx serving static files)
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    image: ghcr.io/fedrpi/livecoding-frontend:latest
     container_name: livecoding_frontend_prod
     ports:
       - "80:80"
