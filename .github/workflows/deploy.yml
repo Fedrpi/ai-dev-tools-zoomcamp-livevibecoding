@@ -1,4 +1,4 @@
-name: Deploy to Cloud
+name: Deploy to Yandex Cloud
 
 on:
   workflow_dispatch:  # Manual deployment only
@@ -6,52 +6,82 @@ on:
       environment:
         description: 'Deployment environment'
         required: true
-        default: 'staging'
+        default: 'production'
         type: choice
         options:
-          - staging
           - production
+  push:
+    branches:
+      - main  # Auto-deploy on push to main
 
 jobs:
   deploy:
-    name: Deploy to ${{ inputs.environment }}
+    name: Deploy to Yandex Cloud (${{ inputs.environment || 'production' }})
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
+    environment: ${{ inputs.environment || 'production' }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy placeholder
+      - name: Setup SSH
         run: |
-          echo "🚀 Deployment to ${{ inputs.environment }} will be configured here"
-          echo "Supported platforms:"
-          echo "  - Railway"
-          echo "  - Fly.io"
-          echo "  - Render"
-          echo "  - Google Cloud Run"
-          echo "  - AWS ECS"
-          echo ""
-          echo "To configure deployment:"
-          echo "1. Choose your cloud platform"
-          echo "2. Add platform-specific secrets to GitHub repository"
-          echo "3. Update this workflow with deployment steps"
-          echo ""
-          echo "For now, this is a placeholder that will be configured later."
+          mkdir -p ~/.ssh
+          echo "${{ secrets.YC_SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.YC_SERVER_IP }} >> ~/.ssh/known_hosts
 
-      # Example for Railway (commented out)
-      # - name: Deploy to Railway
-      #   uses: bervProject/railway-deploy@main
-      #   with:
-      #     railway_token: ${{ secrets.RAILWAY_TOKEN }}
-      #     service: livecoding-backend
+      - name: Deploy to Yandex Cloud
+        env:
+          SERVER_IP: ${{ secrets.YC_SERVER_IP }}
+          SERVER_USER: ${{ secrets.YC_SERVER_USER }}
+        run: |
+          echo "🚀 Deploying to Yandex Cloud..."
 
-      # Example for Fly.io (commented out)
-      # - name: Deploy to Fly.io
-      #   uses: superfly/flyctl-actions/setup-flyctl@master
-      # - run: flyctl deploy --remote-only
+          # Deploy via SSH
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${SERVER_USER}@${SERVER_IP} << 'ENDSSH'
+            set -e
 
-      # Example for Render (commented out)
-      # - name: Trigger Render Deploy
-      #   run: |
-      #     curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
+            # Navigate to project directory
+            cd /home/ubuntu/livevibecoding || {
+              echo "Error: Project directory not found"
+              exit 1
+            }
+
+            # Run deployment script
+            ./deploy.sh
+          ENDSSH
+
+          echo "✅ Deployment completed successfully!"
+
+      - name: Verify Deployment
+        env:
+          SERVER_IP: ${{ secrets.YC_SERVER_IP }}
+        run: |
+          echo "🔍 Verifying deployment..."
+          sleep 10
+
+          # Check health endpoint
+          if curl -f http://${SERVER_IP}/api/health; then
+            echo "✅ Application is healthy!"
+          else
+            echo "⚠️  Health check warning - application might still be starting"
+            exit 1
+          fi
+
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -f ~/.ssh/deploy_key
+
+      - name: Deployment Summary
+        if: success()
+        run: |
+          echo "========================================="
+          echo "🎉 Deployment Successful!"
+          echo "========================================="
+          echo "Environment: ${{ inputs.environment || 'production' }}"
+          echo "Server: ${{ secrets.YC_SERVER_IP }}"
+          echo "Application URL: http://${{ secrets.YC_SERVER_IP }}"
+          echo "API Docs: http://${{ secrets.YC_SERVER_IP }}/api/docs"
+          echo "========================================="
