@@ -111,7 +111,7 @@ docker compose -f "$COMPOSE_FILE" exec -T backend uv run alembic upgrade head
 log_info "Performing health check..."
 sleep 5
 
-if curl -f http://localhost/api/health > /dev/null 2>&1; then
+if curl -f http://localhost/ > /dev/null 2>&1; then
     log_info "✓ Health check passed"
 else
     log_warn "⚠ Health check failed, but continuing..."
