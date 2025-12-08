@@ -2,8 +2,9 @@
 Error schemas
 """
 
+from typing import Any
+
 from pydantic import BaseModel, Field
-from typing import Optional, Dict, Any
 
 
 class Error(BaseModel):
@@ -11,7 +12,7 @@ class Error(BaseModel):
 
     error: str = Field(..., example="ValidationError")
     message: str = Field(..., example="Name must be at least 3 characters")
-    details: Optional[Dict[str, Any]] = None
+    details: dict[str, Any] | None = None
 
     model_config = {
         "json_schema_extra": {
@@ -19,7 +20,7 @@ class Error(BaseModel):
                 {
                     "error": "ValidationError",
                     "message": "Name must be at least 3 characters",
-                    "details": None
+                    "details": None,
                 }
             ]
         }

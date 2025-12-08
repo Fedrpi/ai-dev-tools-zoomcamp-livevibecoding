@@ -1,0 +1,20 @@
+title = "LiveCoding Interview - Gitleaks Configuration"
+
+# Global settings
+[extend]
+useDefault = true
+
+# Allowlist for known false positives
+[allowlist]
+description = "Allowlist for false positives"
+paths = [
+  '''\.env\.example$''',
+  '''\.env\.prod\.example$''',
+  '''docker-compose\.test\.yml$''',
+  '''README\.md$''',
+  '''DEPLOYMENT\.md$''',
+  '''DOCKER\.md$''',
+  '''TESTING\.md$''',
+  '''CI_CD\.md$''',
+  '''POST_DEPLOY\.md$''',
+]

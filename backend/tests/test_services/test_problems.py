@@ -1,7 +1,9 @@
 """
 Tests for problems service
 """
+
 import pytest
+
 from app.services import problems as problems_service
 
 
@@ -15,28 +17,26 @@ async def test_get_problems_all(db_session, sample_problems):
 @pytest.mark.asyncio
 async def test_get_problems_by_difficulty(db_session, sample_problems):
     """Test filtering by difficulty"""
-    result = await problems_service.get_problems(
-        db_session,
-        difficulty="junior",
-        count=10
-    )
+    result = await problems_service.get_problems(db_session, difficulty="junior", count=10)
     assert len(result) == 1
     # Enum values are stored as lowercase in database
-    difficulty_val = result[0].difficulty.value if hasattr(result[0].difficulty, 'value') else result[0].difficulty
+    difficulty_val = (
+        result[0].difficulty.value
+        if hasattr(result[0].difficulty, "value")
+        else result[0].difficulty
+    )
     assert difficulty_val.upper() == "JUNIOR"
 
 
 @pytest.mark.asyncio
 async def test_get_problems_by_language(db_session, sample_problems):
     """Test filtering by language"""
-    result = await problems_service.get_problems(
-        db_session,
-        language="python",
-        count=10
-    )
+    result = await problems_service.get_problems(db_session, language="python", count=10)
     assert len(result) == 3
     for problem in result:
-        language_val = problem.language.value if hasattr(problem.language, 'value') else problem.language
+        language_val = (
+            problem.language.value if hasattr(problem.language, "value") else problem.language
+        )
         assert language_val.upper() == "PYTHON"
 
 

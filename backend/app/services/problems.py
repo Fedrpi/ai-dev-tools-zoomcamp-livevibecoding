@@ -2,19 +2,17 @@
 Problems service - business logic for coding problems
 """
 
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from typing import List, Optional
-from app.models import Problem
 import random
+
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.models import Problem
 
 
 async def get_problems(
-    db: AsyncSession,
-    difficulty: Optional[str] = None,
-    language: Optional[str] = None,
-    count: int = 3
-) -> List[Problem]:
+    db: AsyncSession, difficulty: str | None = None, language: str | None = None, count: int = 3
+) -> list[Problem]:
     """
     Get coding problems with optional filters
     """
@@ -39,7 +37,7 @@ async def get_problems(
     return selected
 
 
-async def get_problem_by_id(db: AsyncSession, problem_id: int) -> Optional[Problem]:
+async def get_problem_by_id(db: AsyncSession, problem_id: int) -> Problem | None:
     """
     Get a single problem by ID
     """

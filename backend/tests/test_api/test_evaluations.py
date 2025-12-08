@@ -1,6 +1,7 @@
 """
 Tests for evaluations API endpoints
 """
+
 import pytest
 
 
@@ -14,8 +15,8 @@ async def test_submit_evaluation(client, sample_problems):
             "interviewerName": "John Doe",
             "difficulty": "junior",
             "language": "python",
-            "numberOfProblems": 1
-        }
+            "numberOfProblems": 1,
+        },
     )
     session_id = create_response.json()["session"]["id"]
     problem_id = create_response.json()["session"]["problems"][0]["id"]
@@ -32,10 +33,10 @@ async def test_submit_evaluation(client, sample_problems):
                     "problemId": problem_id,
                     "rating": 4,
                     "comment": "Good solution",
-                    "candidateCode": "def sum_two_numbers(a, b):\n    return a + b"
+                    "candidateCode": "def sum_two_numbers(a, b):\n    return a + b",
                 }
             ]
-        }
+        },
     )
     assert response.status_code == 201
 
@@ -54,8 +55,8 @@ async def test_submit_evaluation_multiple_problems(client, sample_problems):
             "interviewerName": "John Doe",
             "difficulty": "junior",
             "language": "python",
-            "numberOfProblems": 1
-        }
+            "numberOfProblems": 1,
+        },
     )
     session_id = create_response.json()["session"]["id"]
     problems = create_response.json()["session"]["problems"]
@@ -69,14 +70,13 @@ async def test_submit_evaluation_multiple_problems(client, sample_problems):
             "problemId": p["id"],
             "rating": 4,
             "comment": f"Solution for {p['title']}",
-            "candidateCode": "# code here"
+            "candidateCode": "# code here",
         }
         for p in problems
     ]
 
     response = await client.post(
-        f"/api/sessions/{session_id}/evaluate",
-        json={"evaluations": evaluations}
+        f"/api/sessions/{session_id}/evaluate", json={"evaluations": evaluations}
     )
     assert response.status_code == 201
 
@@ -91,8 +91,8 @@ async def test_submit_evaluation_session_not_ended(client, sample_problems):
             "interviewerName": "John Doe",
             "difficulty": "junior",
             "language": "python",
-            "numberOfProblems": 1
-        }
+            "numberOfProblems": 1,
+        },
     )
     session_id = create_response.json()["session"]["id"]
     problem_id = create_response.json()["session"]["problems"][0]["id"]
@@ -106,10 +106,10 @@ async def test_submit_evaluation_session_not_ended(client, sample_problems):
                     "problemId": problem_id,
                     "rating": 4,
                     "comment": "Good solution",
-                    "candidateCode": "# code"
+                    "candidateCode": "# code",
                 }
             ]
-        }
+        },
     )
     assert response.status_code == 400
 
@@ -124,8 +124,8 @@ async def test_submit_evaluation_invalid_problem_id(client, sample_problems):
             "interviewerName": "John Doe",
             "difficulty": "junior",
             "language": "python",
-            "numberOfProblems": 1
-        }
+            "numberOfProblems": 1,
+        },
     )
     session_id = create_response.json()["session"]["id"]
 
@@ -141,10 +141,10 @@ async def test_submit_evaluation_invalid_problem_id(client, sample_problems):
                     "problemId": 99999,  # Invalid ID
                     "rating": 4,
                     "comment": "Good solution",
-                    "candidateCode": "# code"
+                    "candidateCode": "# code",
                 }
             ]
-        }
+        },
     )
     assert response.status_code == 400
 
@@ -156,14 +156,9 @@ async def test_submit_evaluation_session_not_found(client):
         "/api/sessions/nonexistent_id/evaluate",
         json={
             "evaluations": [
-                {
-                    "problemId": 1,
-                    "rating": 4,
-                    "comment": "Good solution",
-                    "candidateCode": "# code"
-                }
+                {"problemId": 1, "rating": 4, "comment": "Good solution", "candidateCode": "# code"}
             ]
-        }
+        },
     )
     assert response.status_code == 404
 
@@ -178,8 +173,8 @@ async def test_evaluation_rating_range(client, sample_problems):
             "interviewerName": "John Doe",
             "difficulty": "junior",
             "language": "python",
-            "numberOfProblems": 1
-        }
+            "numberOfProblems": 1,
+        },
     )
     session_id = create_response.json()["session"]["id"]
     problem_id = create_response.json()["session"]["problems"][0]["id"]
@@ -195,9 +190,9 @@ async def test_evaluation_rating_range(client, sample_problems):
                         "problemId": problem_id,
                         "rating": rating,
                         "comment": f"Rating {rating}",
-                        "candidateCode": "# code"
+                        "candidateCode": "# code",
                     }
                 ]
-            }
+            },
         )
         assert response.status_code == 201

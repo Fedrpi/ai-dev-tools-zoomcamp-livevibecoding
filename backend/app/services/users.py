@@ -2,9 +2,9 @@
 Users service - business logic for users
 """
 
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from typing import Optional
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.models import User
 
 
@@ -19,7 +19,7 @@ async def create_user(db: AsyncSession, name: str, role: str) -> User:
     return user
 
 
-async def get_user_by_id(db: AsyncSession, user_id: int) -> Optional[User]:
+async def get_user_by_id(db: AsyncSession, user_id: int) -> User | None:
     """
     Get user by ID
     """

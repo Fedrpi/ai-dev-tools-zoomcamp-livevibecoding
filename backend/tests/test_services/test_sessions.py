@@ -1,7 +1,9 @@
 """
 Tests for sessions service
 """
+
 import pytest
+
 from app.services import sessions as sessions_service
 
 
@@ -13,7 +15,7 @@ async def test_create_session(db_session, sample_problems):
         interviewer_name="John Doe",
         difficulty="junior",
         language="python",
-        number_of_problems=1
+        number_of_problems=1,
     )
 
     assert session.id is not None
@@ -22,7 +24,7 @@ async def test_create_session(db_session, sample_problems):
     assert session.language == "python"
     assert session.number_of_problems == 1
     # Status may be enum or string depending on how it's loaded
-    status_val = session.status.value if hasattr(session.status, 'value') else session.status
+    status_val = session.status.value if hasattr(session.status, "value") else session.status
     assert status_val.upper() == "WAITING"
     assert session.interviewer.name == "John Doe"
 
@@ -49,7 +51,7 @@ async def test_create_session_not_enough_problems(db_session, sample_problems):
             interviewer_name="John Doe",
             difficulty="senior",
             language="python",
-            number_of_problems=10  # Only 1 senior problem available
+            number_of_problems=10,  # Only 1 senior problem available
         )
 
 
@@ -95,16 +97,16 @@ async def test_join_session(db_session, sample_problems):
         db_session, "John Doe", "junior", "python", 1
     )
 
-    updated_session = await sessions_service.join_session(
-        db_session,
-        session.id,
-        "Jane Smith"
-    )
+    updated_session = await sessions_service.join_session(db_session, session.id, "Jane Smith")
 
     # Candidate should be loaded because join_session uses get_session_by_id
     assert updated_session.candidate is not None
     assert updated_session.candidate.name == "Jane Smith"
-    status_val = updated_session.status.value if hasattr(updated_session.status, 'value') else updated_session.status
+    status_val = (
+        updated_session.status.value
+        if hasattr(updated_session.status, "value")
+        else updated_session.status
+    )
     assert status_val.upper() == "ACTIVE"
 
 
@@ -112,11 +114,7 @@ async def test_join_session(db_session, sample_problems):
 async def test_join_session_not_found(db_session):
     """Test joining non-existent session"""
     with pytest.raises(ValueError, match="Session not found"):
-        await sessions_service.join_session(
-            db_session,
-            "nonexistent",
-            "Jane Smith"
-        )
+        await sessions_service.join_session(db_session, "nonexistent", "Jane Smith")
 
 
 @pytest.mark.asyncio
@@ -143,7 +141,11 @@ async def test_end_session(db_session, sample_problems):
 
     ended_session = await sessions_service.end_session(db_session, session.id)
 
-    status_val = ended_session.status.value if hasattr(ended_session.status, 'value') else ended_session.status
+    status_val = (
+        ended_session.status.value
+        if hasattr(ended_session.status, "value")
+        else ended_session.status
+    )
     assert status_val.upper() == "ENDED"
     assert ended_session.ended_at is not None
 
@@ -168,4 +170,4 @@ async def test_get_session_problems(db_session, sample_problems):
     problems = sessions_service.get_session_problems(session)
 
     assert len(problems) == 1
-    assert all(hasattr(p, 'title') for p in problems)
+    assert all(hasattr(p, "title") for p in problems)

@@ -1,22 +1,24 @@
 """
 Pytest fixtures for testing
 """
+
 import asyncio
 import os
+
 import pytest
 import pytest_asyncio
-from httpx import AsyncClient, ASGITransport
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from httpx import ASGITransport, AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
 
-from app.main import app
 from app.database import Base, get_db
-from app.models import Problem, User, Session, SessionProblem, Evaluation
+from app.main import app
+from app.models import Problem
 
 # Test database URL - get from environment or use default
 TEST_DATABASE_URL = os.getenv(
     "TEST_DATABASE_URL",
-    "postgresql+asyncpg://livecoding:livecoding_password@localhost:5433/livecoding_test_db"
+    "postgresql+asyncpg://livecoding:livecoding_password@localhost:5433/livecoding_test_db",
 )
 
 
@@ -67,6 +69,7 @@ async def db_session(test_engine):
 @pytest_asyncio.fixture(scope="function")
 async def client(db_session):
     """Create test client with overridden database dependency"""
+
     async def override_get_db():
         yield db_session
 
@@ -85,9 +88,7 @@ async def sample_problems(db_session):
     from sqlalchemy import select
 
     # Query existing problems from database (seeded by migration)
-    result = await db_session.execute(
-        select(Problem).order_by(Problem.id)
-    )
+    result = await db_session.execute(select(Problem).order_by(Problem.id))
     problems = result.scalars().all()
 
     # If no problems exist (e.g., migrations not run), create them
@@ -102,7 +103,7 @@ async def sample_problems(db_session):
                 test_cases=[
                     {"input": [5, 3], "expected": 8},
                     {"input": [0, 0], "expected": 0},
-                ]
+                ],
             ),
             Problem(
                 title="Find Maximum",
@@ -112,7 +113,7 @@ async def sample_problems(db_session):
                 starter_code="def find_max(numbers):\n    # Write your code here\n    pass",
                 test_cases=[
                     {"input": [[1, 5, 3, 9, 2]], "expected": 9},
-                ]
+                ],
             ),
             Problem(
                 title="Binary Tree Traversal",
@@ -122,7 +123,7 @@ async def sample_problems(db_session):
                 starter_code="def inorder_traversal(root):\n    # Write your code here\n    pass",
                 test_cases=[
                     {"input": [{"val": 1, "left": None, "right": None}], "expected": [1]},
-                ]
+                ],
             ),
         ]
 

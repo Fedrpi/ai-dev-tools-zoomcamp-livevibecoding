@@ -2,14 +2,16 @@
 Problems endpoints
 """
 
-from fastapi import APIRouter, Query, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List, Optional, Literal
+from typing import Literal
+
+from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel
-from app.schemas import Problem as ProblemSchema, TestCase
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.database import get_db
+from app.schemas import Problem as ProblemSchema
+from app.schemas import TestCase
 from app.services import problems as problems_service
-import json
 
 router = APIRouter()
 
@@ -141,15 +143,17 @@ _MOCK_PROBLEMS = [
 class ProblemsResponse(BaseModel):
     """Response with list of problems"""
 
-    problems: List[ProblemSchema]
+    problems: list[ProblemSchema]
 
 
 @router.get("", response_model=ProblemsResponse)
 async def get_problems(
-    difficulty: Optional[Literal["junior", "middle", "senior"]] = Query(None, description="Filter by difficulty level"),
-    language: Optional[Literal["python"]] = Query(None, description="Filter by programming language"),
+    difficulty: Literal["junior", "middle", "senior"] | None = Query(
+        None, description="Filter by difficulty level"
+    ),
+    language: Literal["python"] | None = Query(None, description="Filter by programming language"),
     count: int = Query(3, ge=1, le=5, description="Number of random problems to return"),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Get coding problems
@@ -172,7 +176,7 @@ async def get_problems(
             language=p.language.value.lower(),
             description=p.description,
             starterCode=p.starter_code,
-            testCases=test_cases
+            testCases=test_cases,
         )
         problem_schemas.append(problem_schema)
 

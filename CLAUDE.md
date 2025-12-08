@@ -1,52 +1,52 @@
-# Задача
+# Project Goals
 
-1. Разработать с нуля, новый сервис для прохождения LiveCodingInterview
-2. Написать тесты для frontend и backend
-3. Упаковать решение в один публикуемый контейнер
-4. Разработать CI/CD pipeline для github actions с проевкой тестов и деплоем
-5. Опубликовать решение на бесплатном хостинге
+1. Develop a new service for conducting Live Coding Interviews from scratch
+2. Write tests for frontend and backend
+3. Package the solution into publishable containers
+4. Develop CI/CD pipeline for GitHub Actions with tests and deployment
+5. Publish the solution on free hosting
 
-# Технологический стек
+# Technology Stack
 
-Frontend - vue.js
-Backend - python fastapi, используй uv как package python package manager
-Database - postgres
+**Frontend** - Vue.js
+**Backend** - Python FastAPI, using UV as Python package manager
+**Database** - PostgreSQL
 
-# Требования
+# Requirements
 
-У сервиса есть два типа пользователей, нанимающий и собеседующийся
+The service has two types of users: interviewer and candidate
 
-## Требования нанимающего
+## Interviewer Requirements
 
-1. Залогиниться в системе, указать ФИО
-2. Выбрать задачу для собеседующегося
-   При выборе задачи необходимо выбрать уровень сложности, язык программирования и количество задач
-3. Начать сессию Live Coding
-   При начале Live Coding сессии, должна формироваться ссылка для собеседующегося
-4. После подключения собеседующегося нанимающий должен видеть на экране:
-   1. Поле в котором собеседуемый набирает код с подсветкой синтаксиса
-   2. ФИО собеседуемого
-   3. Условие текущей решаемое задачи
-   4. Номер текущей задачи и сколько задач осталось
-   5. Видеть результат запуска кода задачи
-5. Завершить Live Coding сессию
-6. После завершения по каждой задаче оценить уровень её решения и оставить комментарий 
+1. Login to the system, provide full name
+2. Select tasks for the candidate
+   - Choose difficulty level, programming language, and number of tasks
+3. Start Live Coding session
+   - A link for the candidate is generated when starting the session
+4. After candidate connects, interviewer should see:
+   1. Code editor where candidate types code with syntax highlighting
+   2. Candidate's full name
+   3. Current task description
+   4. Current task number and remaining tasks count
+   5. Code execution results
+5. End Live Coding session
+6. After completion, evaluate each task's solution and leave comments
 
-## Требования нанимаемого
+## Candidate Requirements
 
-1. Получить ссылку
-2. Ввести ФИО
-3. Перейти в сессию Live Coding
-4. После подключения собеседующий должен видеть на экране:
-   1. Поле для ввода кода с подсветкой синтаксиса
-   2. ФИО нанимающего
-   3. Условие текущей решаемой задачи
-   4. Номер текущей задачи и сколько задач осталось
-   5. Иметь возможность запустить код задачи
-5. После завершения сессии должен увидеть сообщение с благодарностью за сессию и мудрую цитату
+1. Receive invitation link
+2. Enter full name
+3. Join Live Coding session
+4. After connecting, candidate should see:
+   1. Code editor with syntax highlighting
+   2. Interviewer's full name
+   3. Current task description
+   4. Current task number and remaining tasks count
+   5. Ability to run code
+5. After session completion, see thank you message with a wise quote
 
-# MVP 
+# MVP Scope
 
-1. Интерфейс должен быть на английском языке
-2. В первой версии поддерживаемым языком должен быть python
-3. В первой версии должно быть по 3 задачи для каждого уровня сложности junior, middle, senior 
+1. Interface must be in English
+2. First version supports Python only
+3. First version includes 3 tasks for each difficulty level: Junior, Middle, Senior 
