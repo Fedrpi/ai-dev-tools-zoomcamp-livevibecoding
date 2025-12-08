@@ -360,64 +360,112 @@ Frontend-First Implementation Plan
 
 ---
 
-## Этап 16: CI/CD Pipeline
+## Этап 16: CI/CD Pipeline ✅
 **Цель**: GitHub Actions для тестов и деплоя
 
-- [ ] Создать .github/workflows/test.yml
-  - [ ] Frontend tests
-  - [ ] Backend tests
-  - [ ] Code quality checks (eslint, ruff)
-- [ ] Создать .github/workflows/build.yml
-  - [ ] Build Docker image
-  - [ ] Push в Container Registry
-- [ ] Создать .github/workflows/deploy.yml
-  - [ ] Deploy на хостинг
-- [ ] Протестировать все workflows
+- [x] Создать .github/workflows/ci.yml
+  - [x] Frontend tests (Vitest, 65 tests)
+  - [x] Backend tests (Pytest, 44 tests)
+  - [x] Code quality checks (ESLint, Ruff, MyPy)
+  - [x] Security scan (Gitleaks)
+  - [x] Docker build verification
+- [x] Создать .github/workflows/build.yml
+  - [x] Multi-platform Docker builds (amd64, arm64)
+  - [x] Push в GitHub Container Registry (GHCR)
+  - [x] Auto-tagging (latest, branch, SHA, semver)
+- [x] Создать .github/workflows/deploy.yml
+  - [x] Deploy на Yandex Cloud через SSH
+  - [x] Auto-deploy on push to main
+  - [x] Manual workflow_dispatch trigger
+  - [x] Health check verification
+- [x] Протестировать все workflows
+- [x] Создать CI_CD.md с полной документацией
+
+**Технические детали:**
+- ✅ Параллельные jobs для faster execution
+- ✅ GitHub Service Containers для PostgreSQL в CI
+- ✅ Docker layer caching для быстрой сборки
+- ✅ Environment variables через GitHub Secrets
+- ✅ Deployment script с database backups
+- ✅ Auto-cleanup старых Docker images
 
 ---
 
-## Этап 17: Deployment
-**Цель**: Опубликовать на бесплатном хостинге
+## Этап 17: Deployment ✅
+**Цель**: Опубликовать на облачном хостинге
 
-- [ ] Выбрать хостинг (Railway/Render/Fly.io)
-- [ ] Создать аккаунт
-- [ ] Настроить проект
-- [ ] Настроить environment variables
-- [ ] Настроить PostgreSQL
-- [ ] Deploy приложения
-- [ ] Настроить домен (опционально)
-- [ ] Настроить SSL
-- [ ] Протестировать production build
-- [ ] Проверить все функции в продакшене
+- [x] Выбрать хостинг: **Yandex Cloud**
+- [x] Создать виртуальную машину (Ubuntu)
+- [x] Настроить Docker и Docker Compose на сервере
+- [x] Настроить environment variables (.env.prod)
+- [x] Настроить PostgreSQL в Docker контейнере
+- [x] Deploy приложения через GitHub Actions
+  - [x] SSH deployment с автоматическим pull и restart
+  - [x] Database migrations через Alembic
+  - [x] Database backups при каждом деплое
+- [x] Настроить nginx для проксирования (встроен в Docker)
+- [x] Протестировать production build
+- [x] Проверить все функции в продакшене
+
+**Production URL**: `http://89.169.142.153` (Yandex Cloud)
+
+**Технические детали:**
+- ✅ Deployment через SSH с использованием deploy.sh скрипта
+- ✅ Pull готовых Docker images из GHCR (не собирает на сервере)
+- ✅ Автоматические database backups (хранится 7 последних)
+- ✅ Health checks перед завершением deployment
+- ✅ Auto-deploy при push в main branch
+- ✅ Graceful shutdown старых контейнеров
+- ✅ Production environment variables через .env.prod
+- ✅ PostgreSQL data persistence через Docker volumes
+
+**Исправленные проблемы:**
+- ✅ Использование переменных окружения вместо hardcode путей
+- ✅ Правильная подстановка переменных в healthcheck ($$POSTGRES_USER)
+- ✅ Команды через `uv run` для backend контейнера
+- ✅ Относительные URL для API в production (проксируются nginx)
+- ✅ WebSocket поддержка через nginx proxy
+- ✅ CORS настройки для production
 
 ---
 
 ## Дополнительные задачи
 
-### Документация
-- [ ] Обновить README.md с инструкциями
-- [ ] Добавить API документацию
+### Документация ✅
+- [x] Обновить README.md с инструкциями (Quick Start, Features, Tech Stack)
+- [x] Добавить API документацию (Swagger UI на /docs)
+- [x] Создать DOCKER.md (Docker setup guide)
+- [x] Создать CI_CD.md (CI/CD pipeline documentation)
+- [x] Создать WEBSOCKET.md (WebSocket protocol documentation)
 - [ ] Создать architecture diagram
 - [ ] Добавить screenshots
 
 ### Безопасность
+- [x] Настроить Gitleaks для scan секретов
+- [x] Добавить input validation (Pydantic schemas)
+- [x] Проверить CORS настройки (настроены для production)
+- [x] Code execution через Pyodide (безопасно, в браузере)
+- [x] Non-root user в Docker контейнерах
+- [x] Security headers в nginx
 - [ ] Настроить rate limiting
-- [ ] Добавить input validation везде
-- [ ] Проверить CORS настройки
-- [ ] Аудит безопасности code execution
+- [ ] HTTPS/SSL (отложено)
 
 ### Мониторинг
+- [x] Добавить health checks (database, backend, frontend)
+- [x] Docker healthchecks для всех сервисов
+- [x] Deployment verification в CI/CD
 - [ ] Добавить структурированное логирование
-- [ ] Настроить health checks
-- [ ] Добавить error tracking (опционально)
+- [ ] Добавить error tracking (Sentry - опционально)
 
 ---
 
 ## Прогресс
 - **Всего этапов**: 17
-- **Завершено**: 13 (Этапы 0-11, 13, 15) ✅
+- **Завершено**: 15 (Этапы 0-1, 3-11, 13, 15-17) ✅
 - **Пропущено**: 2 (Этапы 2, 12) ⏭️
-- **Осталось**: 2 (Этапы 16-17)
+- **Осталось**: 0 🎉
+
+## 🎉 MVP ЗАВЕРШЕН И ЗАДЕПЛОЕН!
 
 ### Текущий статус MVP
 
@@ -460,11 +508,38 @@ Frontend-First Implementation Plan
 - DOCKER.md документация
 - Production-ready с security best practices
 
+✅ **CI/CD Pipeline (Этап 16):**
+- GitHub Actions workflows (CI, Build, Deploy)
+- Automated testing (109 tests total: 65 frontend + 44 backend)
+- Docker image builds и push в GHCR
+- Code quality checks (ESLint, Ruff, MyPy)
+- Security scanning (Gitleaks)
+- Multi-platform Docker builds (amd64, arm64)
+- CI_CD.md полная документация
+
+✅ **Production Deployment (Этап 17):**
+- Deployed на Yandex Cloud
+- Production URL: http://89.169.142.153
+- Auto-deploy при push в main
+- SSH deployment с database backups
+- Pull готовых Docker images из GHCR
+- Production environment variables
+- Все функции протестированы и работают
+
 ⏭️ **Пропущено:**
 - Этап 2: UI компоненты Atomic Design (не критично для MVP)
 - Этап 12: Code execution на backend (используем Pyodide на клиенте)
 - Этап 14: Backend тесты (уже сделано на Этапе 10!)
 
-📋 **Следующие шаги:**
-- **Этап 16**: CI/CD Pipeline (GitHub Actions)
-- **Этап 17**: Deployment (бесплатный хостинг)
+🎯 **Возможные улучшения (post-MVP):**
+- HTTPS/SSL сертификаты
+- Custom domain
+- Rate limiting
+- Structured logging
+- Error tracking (Sentry)
+- Architecture diagram
+- Screenshots для README
+- Backend code execution (Docker sandbox)
+- Multi-language support (JavaScript, Go, etc.)
+- Session recording и playback
+- Analytics dashboard
