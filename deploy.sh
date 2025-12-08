@@ -105,7 +105,7 @@ fi
 
 # Run database migrations
 log_info "Running database migrations..."
-docker compose -f "$COMPOSE_FILE" exec -T backend alembic upgrade head
+docker compose -f "$COMPOSE_FILE" exec -T backend uv run alembic upgrade head
 
 # Health check
 log_info "Performing health check..."
