@@ -1,4 +1,8 @@
-const WS_BASE_URL = import.meta.env.VITE_WS_BASE_URL || 'ws://localhost:8000'
+// Use relative WebSocket URL in production (proxied by nginx), localhost for development
+const WS_BASE_URL = import.meta.env.VITE_WS_BASE_URL ||
+  (import.meta.env.MODE === 'production'
+    ? `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}`
+    : 'ws://localhost:8000')
 
 export class WebSocketService {
   constructor() {
