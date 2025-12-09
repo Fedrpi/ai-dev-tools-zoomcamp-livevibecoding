@@ -4,6 +4,8 @@ A real-time collaborative platform for conducting technical coding interviews wi
 
 ## Features
 
+<a href="https://youtu.be/ODW5OJCgh_k"><img src="img/VibeCodingInterview.png" alt="Demo" style="width:50%;height:50%;"></a>
+
 ### For Interviewers
 - 🎯 Create custom interview sessions with difficulty levels (Junior/Middle/Senior)
 - 📝 Select from pre-loaded coding problems or add custom ones

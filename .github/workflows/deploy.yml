@@ -1,6 +1,11 @@
 name: Deploy to Yandex Cloud
 
 on:
+  workflow_run:
+    workflows: ["Build and Push Docker Images"]
+    types:
+      - completed
+    branches: [ main ]
   workflow_dispatch:  # Manual deployment only
     inputs:
       environment:
@@ -10,14 +15,12 @@ on:
         type: choice
         options:
           - production
-  push:
-    branches:
-      - main  # Auto-deploy on push to main
 
 jobs:
   deploy:
     name: Deploy to Yandex Cloud (${{ inputs.environment || 'production' }})
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name != 'workflow_run' }}
     environment: ${{ inputs.environment || 'production' }}
 
     steps:
